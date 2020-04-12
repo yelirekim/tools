@@ -537,6 +537,19 @@ func (v *view) Ignore(uri span.URI) bool {
 		return true
 	}
 
+	if !ok {
+		for glob, ignore := range v.Options().IgnorePaths {
+			if !ignore {
+				continue
+			}
+			match, err := filepath.Match(glob, uri.Filename())
+			if match && err != nil {
+				v.ignoredURIs[uri] = struct{}{}
+				return true
+			}
+		}
+	}
+
 	return ok
 }
 

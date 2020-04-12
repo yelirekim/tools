@@ -178,6 +178,10 @@ type UserOptions struct {
 	// Placeholders adds placeholders to parameters and structs in completion
 	// results.
 	Placeholders bool
+
+	// IgnorePaths specifies a set of file globs for paths we don't need to pay
+	// attention to.
+	IgnorePaths map[string]bool
 }
 
 type completionOptions struct {
@@ -404,6 +408,19 @@ func (o *Options) set(name string, value interface{}) OptionResult {
 		for a, enabled := range allAnalyses {
 			if enabled, ok := enabled.(bool); ok {
 				o.UserEnabledAnalyses[a] = enabled
+			}
+		}
+
+	case "ignore":
+		ignores, ok := value.(map[string]interface{})
+		if !ok {
+			result.errorf("Invalid type %T for map[string]interface{} option %q", value, name)
+			break
+		}
+		o.IgnorePaths = make(map[string]bool)
+		for a, enabled := range ignores {
+			if enabled, ok := enabled.(bool); ok {
+				o.IgnorePaths[a] = enabled
 			}
 		}
 
